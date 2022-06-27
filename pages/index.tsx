@@ -1,9 +1,14 @@
-import type { NextPage } from 'next'
+import type { NextPage, GetServerSidePropsContext } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
+import {connectDB} from '../utils/mongodb'
 import styles from '../styles/Home.module.css'
 
-const Home: NextPage = () => {
+export interface Props {
+  isConnected?: boolean;
+}
+
+const Home: NextPage = ({ isConnected }: Props) => {
   return (
     <div className={styles.container}>
       <Head>
@@ -17,9 +22,17 @@ const Home: NextPage = () => {
           Welcome to <a href="https://nextjs.org">Next.js!</a>
         </h1>
 
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.tsx</code>
+        {isConnected ? (
+          <h2 className="subtitle">You are connected to MongoDB</h2>
+        ) : (
+          <h2 className="subtitle">
+            You are NOT connected to MongoDB. Check the <code>README.md</code>{' '}
+            for instructions.
+          </h2>
+        )}
+
+        <p className="description">
+          Get started by editing <code>pages/index.js</code>
         </p>
 
         <div className={styles.grid}>
@@ -67,6 +80,25 @@ const Home: NextPage = () => {
       </footer>
     </div>
   )
+}
+
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  try {
+    const db = await connectDB()
+
+    const stats = await db.stats();
+
+    console.log('db stats', stats);
+
+    return {
+      props: { isConnected: true },
+    }
+  } catch (e) {
+    console.error(e)
+    return {
+      props: { isConnected: false },
+    }
+  }
 }
 
 export default Home
