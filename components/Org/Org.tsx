@@ -34,7 +34,7 @@ export function Org({regions, ...props}: Props) {
     <div>
       {regions.map(({name}) => {
         return (
-          <a key={name} href={`${protocol}//${name}.${baseUri}`}>{name}</a>
+          <a key={name} href={`/${name}`}>{name}</a>
         )
       })}
     </div>
