@@ -1,8 +1,6 @@
 import '../styles/globals.css'
 import type { AppProps } from 'next/app'
 
-function MyApp({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />
+export default function AfterhoursApp({ Component, pageProps, router }: AppProps) {
+  return <Component {...pageProps} router={router} />
 }
-
-export default MyApp
