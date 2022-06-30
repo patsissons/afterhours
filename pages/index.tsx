@@ -1,6 +1,7 @@
 import type { GetServerSidePropsContext, GetServerSidePropsResult } from 'next'
 import { useRouter } from 'next/router'
 import { ComponentPropsWithoutRef } from 'react'
+import { Auth } from '../components/Auth'
 
 import { Error } from '../components/Error'
 import { Frame } from '../components/Frame'
@@ -36,6 +37,14 @@ export default function OrgPage(props: Props) {
       </Frame>
     )
   }
+
+  return (
+    <Frame>
+      <Page title="Afterhours">
+        <Auth />
+      </Page>
+    </Frame>
+  )
 }
 
 export async function getServerSideProps(context: GetServerSidePropsContext): Promise<GetServerSidePropsResult<{}>> {
@@ -52,7 +61,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
 
     if (!hostInfo.matched) {
       return {
-        notFound: true,
+        props: {},
       }
     }
 

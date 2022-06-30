@@ -2,11 +2,14 @@
   "name": "afterhours",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "^16.15.0"
+  },
   "scripts": {
     "conf": "yarn run conf:link && yarn run conf:env",
     "conf:link": "test -f .vercel/project.json || vercel link",
-    "conf:env": "test -f .env.local || vercel env pull .env.local",
-    "conf:clean": "rm -rf .vercel .env.local",
+    "conf:env": "./scripts/setup-env.sh",
+    "conf:clean": "rm -rf .vercel .env*.local",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -15,6 +18,7 @@
   "dependencies": {
     "mongodb": "4.7.0",
     "next": "12.1.6",
+    "next-auth": "4.7.0",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },
