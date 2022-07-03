@@ -1,4 +1,3 @@
-
 import regionList from './regions.json'
 
 export interface Region {
@@ -27,5 +26,5 @@ export const frozenRecords = {
   },
   region(orgName: string, regionName: string) {
     return orgRegionMap.get(orgName)?.get(regionName)
-  }
+  },
 }

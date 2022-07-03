@@ -1,6 +1,9 @@
 export const hostUtils = {
   parse(host: string) {
-    const match = /^(?<org>[^.]+)\.(?<domain>afterhours)\.(?<tld>[^.:]+)(?<port>:\d+)?$/.exec(host)
+    const match =
+      /^(?<org>[^.]+)\.(?<domain>afterhours)\.(?<tld>[^.:]+)(?<port>:\d+)?$/.exec(
+        host,
+      )
 
     if (!match?.groups) {
       return {matched: false as const}

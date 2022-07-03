@@ -1,5 +1,5 @@
-import { useSession, signIn, signOut } from "next-auth/react";
-import { PropsWithChildren, ReactNode } from "react";
+import {useSession} from 'next-auth/react'
+import {PropsWithChildren, ReactNode} from 'react'
 
 import styles from './Page.module.css'
 

@@ -1,5 +1,6 @@
-import { RegionalEvent } from "../../types/events"
-import { RegionEvent } from "./components"
+import {RegionalEvent} from 'types/events'
+
+import {RegionEvent} from './components'
 
 export interface Props {
   org: string
@@ -9,7 +10,13 @@ export interface Props {
 
 export function OrgRegion({events}: Props) {
   if (events.length > 0) {
-    return <>{events.map((event) => <RegionEvent key={event.id} {...event} />)}</>
+    return (
+      <>
+        {events.map((event) => (
+          <RegionEvent key={event.id} {...event} />
+        ))}
+      </>
+    )
   }
 
   return <p>No events yet...</p>

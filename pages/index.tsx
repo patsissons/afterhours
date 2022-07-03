@@ -1,22 +1,21 @@
-import type { GetServerSidePropsContext, GetServerSidePropsResult } from 'next'
-import { useRouter } from 'next/router'
-import { ComponentPropsWithoutRef } from 'react'
-import { Auth } from '../components/Auth'
-
-import { Error } from '../components/Error'
-import { Frame } from '../components/Frame'
-import { Org } from '../components/Org'
-import { Page } from '../components/Page'
-import { frozenRecords } from '../data/frozen'
-import { hostUtils } from '../utils/host'
+import type {GetServerSidePropsContext, GetServerSidePropsResult} from 'next'
+import {ComponentPropsWithoutRef} from 'react'
+import {Auth} from 'components/Auth'
+import {Error} from 'components/Error'
+import {Frame} from 'components/Frame'
+import {Org} from 'components/Org'
+import {Page} from 'components/Page'
+import {frozenRecords} from 'data/frozen'
+import {EmptyProps} from 'types/react'
+import {hostUtils} from 'utils/host'
+import {logging} from 'utils/logging'
 
 export type Props =
+  | EmptyProps
   | ComponentPropsWithoutRef<typeof Error>
   | ComponentPropsWithoutRef<typeof Org>
 
 export default function OrgPage(props: Props) {
-  const router = useRouter()
-
   if ('error' in props) {
     return (
       <Frame>
@@ -31,7 +30,10 @@ export default function OrgPage(props: Props) {
     const org = props.org
     return (
       <Frame title={`${org} Afterhours`}>
-        <Page title={`${org} Afterhours regions`} description="Click on a region to see the events">
+        <Page
+          title={`${org} Afterhours regions`}
+          description="Click on a region to see the events"
+        >
           <Org org={org} regions={props.regions} />
         </Page>
       </Frame>
@@ -47,7 +49,9 @@ export default function OrgPage(props: Props) {
   )
 }
 
-export async function getServerSideProps(context: GetServerSidePropsContext): Promise<GetServerSidePropsResult<{}>> {
+export async function getServerSideProps(
+  context: GetServerSidePropsContext,
+): Promise<GetServerSidePropsResult<Props>> {
   try {
     const host = context.req.headers.host
 
@@ -81,7 +85,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext): Pr
       },
     }
   } catch (error) {
-    console.error(error)
+    logging.error(error)
     return {
       props: {
         error,

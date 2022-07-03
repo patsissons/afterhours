@@ -1,16 +1,19 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-import { EventRepository } from '../../../data/events'
-import { RegionalEvent } from '../../../types/events'
+import type {NextApiRequest, NextApiResponse} from 'next'
+import {EventRepository} from 'data/events'
+import {RegionalEvent} from 'types/events'
+import {logging} from 'utils/logging'
 
-export type Body = {id: string}
+export interface Body {
+  id: string
+}
 export type Payload = RegionalEvent | {error: any}
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Payload>
+  res: NextApiResponse<Payload>,
 ) {
   try {
-    const body = JSON.parse(req.body) as Body;
+    const body = JSON.parse(req.body) as Body
     const {id} = body
 
     if (!id) {
@@ -39,7 +42,7 @@ export default async function handler(
 
     res.status(200).json(result.value)
   } catch (error: any) {
-    console.log('delete error', error)
+    logging.error('delete error', error)
     res.status(500).json({
       error: error.toString(),
     })

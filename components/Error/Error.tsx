@@ -1,4 +1,4 @@
-import { JsonData } from "../JsonData/JsonData"
+import {JsonData} from 'components/JsonData'
 
 export interface Props {
   error: any

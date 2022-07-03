@@ -1,9 +1,11 @@
-import { MongoClient, MongoClientOptions } from 'mongodb'
+import {MongoClient, MongoClientOptions} from 'mongodb'
+
+import {isDevelopment, MONGODB_URI} from './env'
 
 const defaultOptions: MongoClientOptions = {}
 
 export function client(options = defaultOptions) {
-  const uri = process.env.MONGODB_URI
+  const uri = MONGODB_URI
 
   if (!uri) {
     throw new Error('Please add MONGODB_URI to .env.local')
@@ -13,8 +15,11 @@ export function client(options = defaultOptions) {
 }
 
 export function connectClient(options = defaultOptions) {
-  if (process.env.NODE_ENV === 'development') {
-    return global._mongoClientPromise || (global._mongoClientPromise = client(options).connect())
+  if (isDevelopment) {
+    return (
+      global._mongoClientPromise ||
+      (global._mongoClientPromise = client(options).connect())
+    )
   }
 
   return client(options).connect()

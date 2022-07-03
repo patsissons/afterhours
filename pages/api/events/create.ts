@@ -1,18 +1,17 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-import { RegionalEvent } from '../../../types/events'
-
-import { frozenRecords } from '../../../data/frozen'
-import { EventRepository } from '../../../data/events'
+import type {NextApiRequest, NextApiResponse} from 'next'
+import {RegionalEvent} from 'types/events'
+import {frozenRecords} from 'data/frozen'
+import {EventRepository} from 'data/events'
 
 export type Body = Omit<RegionalEvent, 'id'>
 export type Payload = RegionalEvent | {error: any}
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Payload>
+  res: NextApiResponse<Payload>,
 ) {
   try {
-    const body = JSON.parse(req.body) as Body;
+    const body = JSON.parse(req.body) as Body
     const {date, details} = body
     const region = frozenRecords.region(body.org, body.region)
 

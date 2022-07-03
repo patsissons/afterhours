@@ -1,13 +1,14 @@
-import { GetServerSidePropsContext, GetServerSidePropsResult } from "next";
-import { useRouter } from "next/router";
-import { ComponentPropsWithoutRef } from "react";
-import { Error } from "../components/Error";
-import { Frame } from "../components/Frame";
-import { OrgRegion } from "../components/OrgRegion";
-import { Page } from "../components/Page";
-import { EventRepository } from "../data/events";
-import { frozenRecords } from "../data/frozen";
-import { hostUtils } from "../utils/host";
+import {GetServerSidePropsContext, GetServerSidePropsResult} from 'next'
+import {useRouter} from 'next/router'
+import {ComponentPropsWithoutRef} from 'react'
+import {Error} from 'components/Error'
+import {Frame} from 'components/Frame'
+import {OrgRegion} from 'components/OrgRegion'
+import {Page} from 'components/Page'
+import {EventRepository} from 'data/events'
+import {frozenRecords} from 'data/frozen'
+import {hostUtils} from 'utils/host'
+import {logging} from 'utils/logging'
 
 export type Props =
   | ComponentPropsWithoutRef<typeof Error>
@@ -32,44 +33,58 @@ export default function RegionPage(props: Props) {
 
     return (
       <Frame title={`${org} ${displayRegion} Afterhours`}>
-        <Page title={`${displayRegion} Afterhours`} description={`${org} events for ${displayRegion}`}>
+        <Page
+          title={`${displayRegion} Afterhours`}
+          description={`${org} events for ${displayRegion}`}
+        >
           <input type="text" id="event-id" />
-          <button type="button" onClick={() => {
-            handleCreate({
-              date: new Date().toISOString(),
-              org,
-              region,
-              details: {
-                location: {
-                  name: 'testing',
+          <button
+            type="button"
+            onClick={() => {
+              handleCreate({
+                date: new Date().toISOString(),
+                org,
+                region,
+                details: {
+                  location: {
+                    name: 'testing',
+                  },
                 },
-              },
-            })
-          }}>
+              })
+            }}
+          >
             create test event
           </button>
-          <button type="button" onClick={() => {
-            const id = eventIdElement()
+          <button
+            type="button"
+            onClick={() => {
+              const id = eventIdElement()
 
-            if (id) {
-              const event = props.events.find((event) => event.id === id.value)
+              if (id) {
+                const event = props.events.find(
+                  (event) => event.id === id.value,
+                )
 
-              if (event) {
-                handleUpdate(event)
-                id.value = ''
+                if (event) {
+                  handleUpdate(event)
+                  id.value = ''
+                }
               }
-            }
-          }}>
+            }}
+          >
             update by id
           </button>
-          <button type="button" onClick={() => {
-            const id = eventIdElement()
+          <button
+            type="button"
+            onClick={() => {
+              const id = eventIdElement()
 
-            if (id) {
-              handleDelete(id.value)
-              id.value = ''
-            }
-          }}>
+              if (id) {
+                handleDelete(id.value)
+                id.value = ''
+              }
+            }}
+          >
             delete by id
           </button>
           <OrgRegion org={org} region={props.region} events={props.events} />
@@ -83,9 +98,12 @@ export default function RegionPage(props: Props) {
   }
 
   async function handleCreate(event: any) {
-    const res = await fetch('/api/events/create', {method: 'POST', body: JSON.stringify(event)})
+    const res = await fetch('/api/events/create', {
+      method: 'POST',
+      body: JSON.stringify(event),
+    })
     const result = await res.json()
-    console.log('create', {event, result})
+    logging.info('event created', result)
     router.replace(router.asPath)
   }
 
@@ -95,25 +113,35 @@ export default function RegionPage(props: Props) {
       date: new Date().toISOString(),
       details: {
         ...event.details,
-        notes: "updated!",
+        notes: 'updated!',
       },
       deleted: false,
     }
-    const res = await fetch('/api/events/update', {method: 'POST', body: JSON.stringify(update)})
+    const res = await fetch('/api/events/update', {
+      method: 'POST',
+      body: JSON.stringify(update),
+    })
     const result = await res.json()
-    console.log('delete', {update, result})
+    logging.info('event updated', result)
     router.replace(router.asPath)
   }
 
   async function handleDelete(id: string) {
-    const res = await fetch('/api/events/delete', {method: 'POST', body: JSON.stringify({id})})
+    const res = await fetch('/api/events/delete', {
+      method: 'POST',
+      body: JSON.stringify({id}),
+    })
     const result = await res.json()
-    console.log('delete', {id, result})
+    logging.info('event deleted', result)
     router.replace(router.asPath)
   }
 }
 
-export async function getServerSideProps({query, req, resolvedUrl}: GetServerSidePropsContext): Promise<GetServerSidePropsResult<{}>> {
+export async function getServerSideProps({
+  query,
+  req,
+  resolvedUrl,
+}: GetServerSidePropsContext): Promise<GetServerSidePropsResult<Props>> {
   try {
     const {host} = req.headers
 
@@ -149,11 +177,10 @@ export async function getServerSideProps({query, req, resolvedUrl}: GetServerSid
       }
     }
 
-    const events = await EventRepository.default
-      .fromRegion(org, regionName, {
-        deleted: Boolean('deleted' in query),
-        skip: Number(query.skip || 0),
-      })
+    const events = await EventRepository.default.fromRegion(org, regionName, {
+      deleted: Boolean('deleted' in query),
+      skip: Number(query.skip || 0),
+    })
 
     return {
       props: {
@@ -163,7 +190,7 @@ export async function getServerSideProps({query, req, resolvedUrl}: GetServerSid
       },
     }
   } catch (error: any) {
-    console.error(error)
+    logging.error(error)
     return {
       props: {
         error: error.toString(),

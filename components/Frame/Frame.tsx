@@ -1,16 +1,19 @@
-import Head from "next/head";
-import { PropsWithChildren } from "react"
+import Head from 'next/head'
+import {PropsWithChildren} from 'react'
+import {Footer} from 'components/Footer'
 
-import { Footer } from "../Footer";
-
-import styles from './Frame.module.css';
+import styles from './Frame.module.css'
 
 export interface Props {
   title?: string
   description?: string
 }
 
-export function Frame({children, description, title = "Afterhours"}: PropsWithChildren<Props>) {
+export function Frame({
+  children,
+  description,
+  title = 'Afterhours',
+}: PropsWithChildren<Props>) {
   return (
     <div className={styles.container}>
       <Head>

@@ -1,13 +1,12 @@
-import { useRouter } from "next/router"
-import { useEffect, useState } from "react"
-import { Region } from "../../data/frozen"
+import {useEffect, useState} from 'react'
+import {Region} from 'data/frozen'
 
 export interface Props {
   org: string
   regions: Region[]
 }
 
-export function Org({regions, ...props}: Props) {
+export function Org({regions}: Props) {
   const [baseUri, setBaseUri] = useState<string>()
   useEffect(() => {
     const {host, hash, search} = window.location
@@ -25,16 +24,16 @@ export function Org({regions, ...props}: Props) {
   }, [])
 
   if (!baseUri) {
-    return null;
+    return null
   }
-
-  const {protocol} = window.location
 
   return (
     <div>
       {regions.map(({name}) => {
         return (
-          <a key={name} href={`/${name}`}>{name}</a>
+          <a key={name} href={`/${name}`}>
+            {name}
+          </a>
         )
       })}
     </div>

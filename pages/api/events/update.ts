@@ -1,16 +1,16 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-import { EventRepository } from '../../../data/events'
-import { RegionalEvent } from '../../../types/events'
+import type {NextApiRequest, NextApiResponse} from 'next'
+import {EventRepository} from 'data/events'
+import {RegionalEvent} from 'types/events'
 
 export type Body = RegionalEvent
 export type Payload = RegionalEvent | {error: any}
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Payload>
+  res: NextApiResponse<Payload>,
 ) {
   try {
-    const body = JSON.parse(req.body) as Body;
+    const body = JSON.parse(req.body) as Body
     const result = await EventRepository.default.update(body)
 
     if ('error' in result) {
@@ -20,7 +20,7 @@ export default async function handler(
           body: req.body,
           parsed: body,
           result: result.error,
-        }
+        },
       })
       return
     }

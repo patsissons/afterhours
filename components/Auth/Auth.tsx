@@ -1,13 +1,19 @@
-import { signIn, signOut, useSession } from "next-auth/react"
+import {signIn, signOut, useSession} from 'next-auth/react'
 
 export function Auth() {
-  const {data: session, status} = useSession()
+  const {data: session} = useSession()
 
   return (
-    <button type="button" onClick={handleAuth}>Sign {session ? 'out' : 'in'}</button>
+    <button type="button" onClick={handleAuth}>
+      Sign {session ? 'out' : 'in'}
+    </button>
   )
 
   function handleAuth() {
-    session ? signOut() : signIn()
+    if (session) {
+      signOut()
+    } else {
+      signIn()
+    }
   }
 }

@@ -3,7 +3,7 @@ export interface RegionalEventDetails {
     name: string
     coords?: string
     url?: string
-  },
+  }
   notes?: string
 }
 
