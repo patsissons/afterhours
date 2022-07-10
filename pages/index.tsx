@@ -5,10 +5,10 @@ import {Error} from 'components/Error'
 import {Frame} from 'components/Frame'
 import {Org} from 'components/Org'
 import {Page} from 'components/Page'
-import {frozenRecords} from 'data/frozen'
-import {EmptyProps} from 'types/react'
 import {hostUtils} from 'utils/host'
 import {logging} from 'utils/logging'
+import {RegionRepository} from 'data'
+import {EmptyProps} from 'types'
 
 export type Props =
   | EmptyProps
@@ -29,9 +29,9 @@ export default function OrgPage(props: Props) {
   if ('regions' in props) {
     const org = props.org
     return (
-      <Frame title={`${org} Afterhours`}>
+      <Frame title={`${org} afterhours`}>
         <Page
-          title={`${org} Afterhours regions`}
+          title={`${org} afterhours regions`}
           description="Click on a region to see the events"
         >
           <Org org={org} regions={props.regions} />
@@ -42,18 +42,18 @@ export default function OrgPage(props: Props) {
 
   return (
     <Frame>
-      <Page title="Afterhours">
+      <Page title="afterhours">
         <Auth />
       </Page>
     </Frame>
   )
 }
 
-export async function getServerSideProps(
-  context: GetServerSidePropsContext,
-): Promise<GetServerSidePropsResult<Props>> {
+export async function getServerSideProps({
+  req,
+}: GetServerSidePropsContext): Promise<GetServerSidePropsResult<Props>> {
   try {
-    const host = context.req.headers.host
+    const host = req.headers.host
 
     if (!host) {
       return {
@@ -70,13 +70,7 @@ export async function getServerSideProps(
     }
 
     const {org} = hostInfo
-    const regions = frozenRecords.regionNames(org)
-
-    if (!regions) {
-      return {
-        notFound: true,
-      }
-    }
+    const regions = await RegionRepository.default.fromOrg(org)
 
     return {
       props: {

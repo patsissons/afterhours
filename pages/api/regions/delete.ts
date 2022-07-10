@@ -1,10 +1,10 @@
 import type {NextApiRequest, NextApiResponse} from 'next'
-import {EventRepository, ModelIdentifiable, RegionalEventModel} from 'data'
+import {ModelIdentifiable, RegionModel, RegionRepository} from 'data'
 import {ResultOrError} from 'types'
 import {logging} from 'utils/logging'
 
 export type Body = ModelIdentifiable
-export type Payload = ResultOrError<RegionalEventModel>
+export type Payload = ResultOrError<RegionModel>
 
 export default async function handler(
   req: NextApiRequest,
@@ -25,7 +25,7 @@ export default async function handler(
       return
     }
 
-    const result = await EventRepository.default.delete({id})
+    const result = await RegionRepository.default.delete({id})
 
     if ('error' in result) {
       res.status(500).json({

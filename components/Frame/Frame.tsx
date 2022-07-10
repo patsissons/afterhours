@@ -12,7 +12,7 @@ export interface Props {
 export function Frame({
   children,
   description,
-  title = 'Afterhours',
+  title = 'afterhours',
 }: PropsWithChildren<Props>) {
   return (
     <div className={styles.container}>

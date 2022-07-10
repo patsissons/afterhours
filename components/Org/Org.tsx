@@ -1,9 +1,9 @@
+import type {RegionModel} from 'data'
 import {useEffect, useState} from 'react'
-import {Region} from 'data/frozen'
 
 export interface Props {
   org: string
-  regions: Region[]
+  regions: RegionModel[]
 }
 
 export function Org({regions}: Props) {

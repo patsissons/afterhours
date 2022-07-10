@@ -8,7 +8,11 @@ import {
   GOOGLE_ID,
   GOOGLE_SECRET,
   SECRET,
+  VERCEL_URL,
+  isDevelopment,
 } from 'utils/env'
+
+const secure = Boolean(VERCEL_URL)
 
 // For more information on each option (and a full list of options) go to
 // https://next-auth.js.org/configuration/options
@@ -19,6 +23,19 @@ export default NextAuth({
   // https://next-auth.js.org/configuration/options#secret
   // randomly generated secret: openssl rand -hex 32
   secret: SECRET,
+
+  cookies: {
+    sessionToken: {
+      name: `${secure ? '__Secure-' : ''}next-auth.session-token`,
+      options: {
+        httpOnly: !isDevelopment,
+        sameSite: 'lax',
+        path: '/',
+        domain: isDevelopment ? 'localhost' : '.afterhours.place',
+        secure,
+      },
+    },
+  },
 })
 
 export function createProviders() {

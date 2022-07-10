@@ -1,9 +1,9 @@
 import type {NextApiRequest, NextApiResponse} from 'next'
-import {EventRepository, RegionalEventModel} from 'data'
 import {ResultOrError} from 'types'
+import {Region, RegionModel, RegionRepository} from 'data'
 
-export type Body = RegionalEventModel
-export type Payload = ResultOrError<RegionalEventModel>
+export type Body = Region
+export type Payload = ResultOrError<RegionModel>
 
 export default async function handler(
   req: NextApiRequest,
@@ -11,14 +11,14 @@ export default async function handler(
 ) {
   try {
     const body = JSON.parse(req.body) as Body
-    const result = await EventRepository.default.update(body)
+
+    const result = await RegionRepository.default.create(body)
 
     if ('error' in result) {
       res.status(500).json({
         error: {
-          message: 'unable to update event',
+          message: 'unable to create region',
           body: req.body,
-          parsed: body,
           result: result.error,
         },
       })

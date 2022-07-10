@@ -5,8 +5,7 @@ import {Error} from 'components/Error'
 import {Frame} from 'components/Frame'
 import {OrgRegion} from 'components/OrgRegion'
 import {Page} from 'components/Page'
-import {EventRepository} from 'data/events'
-import {frozenRecords} from 'data/frozen'
+import {EventRepository, RegionRepository} from 'data'
 import {hostUtils} from 'utils/host'
 import {logging} from 'utils/logging'
 
@@ -32,9 +31,9 @@ export default function RegionPage(props: Props) {
     const displayRegion = region.toUpperCase()
 
     return (
-      <Frame title={`${org} ${displayRegion} Afterhours`}>
+      <Frame title={`${org} ${displayRegion} afterhours`}>
         <Page
-          title={`${displayRegion} Afterhours`}
+          title={`${displayRegion} afterhours`}
           description={`${org} events for ${displayRegion}`}
         >
           <input type="text" id="event-id" />
@@ -160,16 +159,8 @@ export async function getServerSideProps({
     }
 
     const {org} = hostInfo
-    const regions = frozenRecords.regionNames(org)
-
-    if (!regions) {
-      return {
-        notFound: true,
-      }
-    }
-
-    const regionName = resolvedUrl.replace(/^\//, '')
-    const region = frozenRecords.region(org, regionName)
+    const name = resolvedUrl.replace(/^\//, '')
+    const region = await RegionRepository.default.fromName(org, name)
 
     if (!region) {
       return {
@@ -177,7 +168,7 @@ export async function getServerSideProps({
       }
     }
 
-    const events = await EventRepository.default.fromRegion(org, regionName, {
+    const events = await EventRepository.default.fromRegion(org, name, {
       deleted: Boolean('deleted' in query),
       skip: Number(query.skip || 0),
     })
@@ -185,7 +176,7 @@ export async function getServerSideProps({
     return {
       props: {
         org,
-        region: regionName,
+        region: name,
         events,
       },
     }

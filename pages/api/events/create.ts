@@ -1,10 +1,14 @@
 import type {NextApiRequest, NextApiResponse} from 'next'
-import {RegionalEvent} from 'types/events'
-import {frozenRecords} from 'data/frozen'
-import {EventRepository} from 'data/events'
+import {ResultOrError} from 'types'
+import {
+  EventRepository,
+  RegionalEvent,
+  RegionalEventModel,
+  RegionRepository,
+} from 'data'
 
-export type Body = Omit<RegionalEvent, 'id'>
-export type Payload = RegionalEvent | {error: any}
+export type Body = RegionalEvent
+export type Payload = ResultOrError<RegionalEventModel>
 
 export default async function handler(
   req: NextApiRequest,
@@ -13,7 +17,10 @@ export default async function handler(
   try {
     const body = JSON.parse(req.body) as Body
     const {date, details} = body
-    const region = frozenRecords.region(body.org, body.region)
+    const region = await RegionRepository.default.fromName(
+      body.org,
+      body.region,
+    )
 
     if (!region) {
       res.status(500).json({
@@ -44,7 +51,7 @@ export default async function handler(
       return
     }
 
-    res.status(200).json(result.value)
+    res.status(200).json(result)
   } catch (error) {
     res.status(500).json({
       error,

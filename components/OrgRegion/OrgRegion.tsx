@@ -1,4 +1,4 @@
-import {RegionalEvent} from 'types/events'
+import type {RegionalEvent} from 'data'
 
 import {RegionEvent} from './components'
 

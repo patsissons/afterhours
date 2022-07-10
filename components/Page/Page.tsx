@@ -1,4 +1,4 @@
-import {useSession} from 'next-auth/react'
+import {useAuth} from 'hooks/auth'
 import {PropsWithChildren, ReactNode} from 'react'
 
 import styles from './Page.module.css'
@@ -9,12 +9,12 @@ export interface Props {
 }
 
 export function Page({title, children, description}: PropsWithChildren<Props>) {
-  const {data: session, status} = useSession()
+  const {user, status} = useAuth()
 
   return (
     <main className={styles.main}>
       <h1 className={styles.title}>{title}</h1>
-      <p>{`[${status}] ${session?.user?.email || ''}`}</p>
+      <p>{`[${status}] ${user?.email || ''}`}</p>
       {description && <p className={styles.description}>{description}</p>}
       {children}
     </main>

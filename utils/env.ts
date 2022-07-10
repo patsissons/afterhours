@@ -7,5 +7,7 @@ export const GOOGLE_SECRET = process.env.GOOGLE_SECRET
 export const MONGODB_URI = process.env.MONGODB_URI
 export const SECRET = process.env.SECRET
 export const NODE_ENV = process.env.NODE_ENV
+export const VERCEL_URL = process.env.VERCEL_URL
 
 export const isDevelopment = Boolean(NODE_ENV === 'development')
+export const isProduction = Boolean(NODE_ENV === 'production')
