@@ -1,16 +1,15 @@
 import {Filter} from 'mongodb'
-
 import {
   BaseDocument,
   Deletable,
   ISO8601Date,
   ModelIdentifiable,
   ModelTimestampable,
+  MongoRepository,
   NakedDocument,
   NakedModel,
   WithDates,
-} from './types'
-import {Repository} from './repository'
+} from 'mongo-repository'
 
 export interface RegionalEventDetails {
   location: {
@@ -43,7 +42,7 @@ export interface FromRegionOptions {
   skip?: number
 }
 
-export class EventRepository extends Repository<
+export class EventRepository extends MongoRepository<
   RegionalEventDocument,
   RegionalEventModel
 > {

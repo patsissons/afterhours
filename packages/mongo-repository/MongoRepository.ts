@@ -6,9 +6,9 @@ import {
   OptionalUnlessRequiredId,
   UpdateFilter,
 } from 'mongodb'
-import {ResultOrError} from 'types'
 import {connectDB} from 'utils/mongodb'
 
+import {MongoRepositoryError} from './MongoRepositoryError'
 import {
   AnyId,
   BaseDocument,
@@ -18,10 +18,9 @@ import {
   ModelUpdate,
   NakedDocument,
   NakedModel,
-  ResultPromise,
 } from './types'
 
-export abstract class Repository<
+export abstract class MongoRepository<
   Doc extends BaseDocument,
   Model extends BaseModel,
 > {
@@ -70,7 +69,7 @@ export abstract class Repository<
   static async create<Doc extends BaseDocument>(
     collectionName: string,
     data: NakedDocument<Doc>,
-  ): ResultPromise<Doc> {
+  ): Promise<Doc> {
     const created = new Date()
     const doc = {
       ...(data as Document),
@@ -84,81 +83,77 @@ export abstract class Repository<
     ).insertOne(doc)
 
     if (!acknowledged) {
-      return {error: {message: 'insert failed'}}
+      throw MongoRepositoryError.fromMessage('insert failed')
     }
 
-    return {value: {...doc, _id} as Doc}
+    return {...doc, _id} as Doc
   }
 
   static async update<Doc extends BaseDocument>(
     collectionName: string,
     {_id, deleted, ...data}: DocUpdate<Doc>,
-  ): ResultPromise<Doc> {
+  ): Promise<Doc> {
     const filter = {_id} as Filter<Doc>
     const update = {
       $set: {...(data as Document), updated: new Date(), deleted},
     } as UpdateFilter<Doc>
-    const {
-      ok,
-      value,
-      lastErrorObject: error = {message: 'update failed'},
-    } = await (
+    const {ok, value, lastErrorObject} = await (
       await this.collection<Doc>(collectionName)
     ).findOneAndUpdate(filter, update)
 
     if (!ok || !value) {
-      return {error}
+      throw new MongoRepositoryError(
+        lastErrorObject ?? {message: 'update failed'},
+      )
     }
 
-    return {value: value as Doc}
+    return value as Doc
   }
 
   static async delete<Doc extends BaseDocument>(
     collectionName: string,
     {id}: ModelIdentifiable,
-  ): ResultPromise<Doc> {
+  ): Promise<Doc> {
     const filter = {_id: this.toDocId(id)} as Filter<Doc>
     const update = {
       $set: {updated: new Date(), deleted: true},
     } as UpdateFilter<Doc>
-    const {
-      ok,
-      value,
-      lastErrorObject: error = {message: 'delete failed'},
-    } = await (
+    const {ok, value, lastErrorObject} = await (
       await this.collection<Doc>(collectionName)
     ).findOneAndUpdate(filter, update)
 
     if (!ok || !value) {
-      return {error}
+      throw new MongoRepositoryError(
+        lastErrorObject ?? {message: 'delete failed'},
+      )
     }
 
-    return {value: value as Doc}
+    return value as Doc
   }
 
   protected constructor(public readonly collectionName: string) {}
 
   public db() {
-    return Repository.db()
+    return MongoRepository.db()
   }
 
   public collection<T extends Document = Doc>() {
-    return Repository.collection<T>(this.collectionName)
+    return MongoRepository.collection<T>(this.collectionName)
   }
 
   public async find(id: AnyId) {
-    const doc = await Repository.find<Doc>(this.collectionName, id)
+    const doc = await MongoRepository.find<Doc>(this.collectionName, id)
 
     return this.toModel(doc)
   }
 
   public async create(data: NakedModel<Model>) {
-    const result = await Repository.create<Doc>(
+    const result = await MongoRepository.create<Doc>(
       this.collectionName,
       this.coerceDoc(data),
     )
 
-    return this.toErrorOrModel(result)
+    return this.toModel(result)
   }
 
   public async update({id, deleted, ...model}: ModelUpdate<Model>) {
@@ -167,19 +162,19 @@ export abstract class Repository<
       _id: this.coerceObjectId(id),
       deleted,
     }
-    const result = await Repository.update<Doc>(this.collectionName, data)
+    const result = await MongoRepository.update<Doc>(this.collectionName, data)
 
-    return this.toErrorOrModel(result)
+    return this.toModel(result)
   }
 
   public async delete(data: ModelIdentifiable) {
-    const result = await Repository.delete<Doc>(this.collectionName, data)
+    const result = await MongoRepository.delete<Doc>(this.collectionName, data)
 
-    return this.toErrorOrModel(result)
+    return this.toModel(result)
   }
 
   protected coerceObjectId(id: string | ObjectId) {
-    return Repository.coerceObjectId(id)
+    return MongoRepository.coerceObjectId(id)
   }
 
   protected toModel(doc: Doc): Model
@@ -193,7 +188,7 @@ export abstract class Repository<
 
     return {
       ...this.coerceModel(model as NakedDocument<Doc>),
-      id: Repository.fromDocId(_id),
+      id: MongoRepository.fromDocId(_id),
       created: created.toISOString(),
       updated: updated.toISOString(),
     } as Model
@@ -205,13 +200,5 @@ export abstract class Repository<
 
   protected coerceModel(data: NakedDocument<Doc>): NakedModel<Model> {
     return data as any
-  }
-
-  private toErrorOrModel(result: ResultOrError<Doc, Document>) {
-    if ('error' in result) {
-      return result
-    }
-
-    return {value: this.toModel(result.value)}
   }
 }

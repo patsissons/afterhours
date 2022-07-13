@@ -1,19 +1,16 @@
-import {GetServerSidePropsContext, GetServerSidePropsResult} from 'next'
 import {useRouter} from 'next/router'
 import {ComponentPropsWithoutRef} from 'react'
 import {Error} from 'components/Error'
-import {Frame} from 'components/Frame'
-import {OrgRegion} from 'components/OrgRegion'
-import {Page} from 'components/Page'
-import {EventRepository, RegionRepository} from 'data'
-import {hostUtils} from 'utils/host'
+import {Frame, Page} from 'foundation'
 import {logging} from 'utils/logging'
+
+import {OrgRegion} from './components'
 
 export type Props =
   | ComponentPropsWithoutRef<typeof Error>
   | ComponentPropsWithoutRef<typeof OrgRegion>
 
-export default function RegionPage(props: Props) {
+export function RegionPage(props: Props) {
   const router = useRouter()
 
   if ('error' in props) {
@@ -133,59 +130,5 @@ export default function RegionPage(props: Props) {
     const result = await res.json()
     logging.info('event deleted', result)
     router.replace(router.asPath)
-  }
-}
-
-export async function getServerSideProps({
-  query,
-  req,
-  resolvedUrl,
-}: GetServerSidePropsContext): Promise<GetServerSidePropsResult<Props>> {
-  try {
-    const {host} = req.headers
-
-    if (!host) {
-      return {
-        notFound: true,
-      }
-    }
-
-    const hostInfo = hostUtils.parse(host)
-
-    if (!hostInfo.matched) {
-      return {
-        notFound: true,
-      }
-    }
-
-    const {org} = hostInfo
-    const name = resolvedUrl.replace(/^\//, '')
-    const region = await RegionRepository.default.fromName(org, name)
-
-    if (!region) {
-      return {
-        notFound: true,
-      }
-    }
-
-    const events = await EventRepository.default.fromRegion(org, name, {
-      deleted: Boolean('deleted' in query),
-      skip: Number(query.skip || 0),
-    })
-
-    return {
-      props: {
-        org,
-        region: name,
-        events,
-      },
-    }
-  } catch (error: any) {
-    logging.error(error)
-    return {
-      props: {
-        error: error.toString(),
-      },
-    }
   }
 }

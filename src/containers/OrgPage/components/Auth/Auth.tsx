@@ -1,10 +1,9 @@
-import {useAuth} from 'hooks/auth'
-import {useAuthOrg} from 'hooks/region'
+import {useAuth, useAuthOrg} from 'hooks/auth'
 import {signIn, signOut} from 'next-auth/react'
 import {useRouter} from 'next/router'
 import {useEffect, useState} from 'react'
 import {isDevelopment} from 'utils/env'
-import {hostUtils} from 'utils/host'
+import {orgForHost} from 'utils/host'
 
 export function Auth() {
   const {user} = useAuth()
@@ -36,9 +35,9 @@ export function Auth() {
     }
 
     const {protocol, host} = window.location
-    const hostInfo = hostUtils.parse(host)
+    const org = orgForHost(host)
 
-    if (hostInfo.matched && hostInfo.org === authOrg) {
+    if (org === authOrg) {
       return
     }
 

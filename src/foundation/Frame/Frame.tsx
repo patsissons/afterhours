@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import {PropsWithChildren} from 'react'
-import {Footer} from 'components/Footer'
 
+import {Footer} from './components'
 import styles from './Frame.module.css'
 
 export interface Props {
