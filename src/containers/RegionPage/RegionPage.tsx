@@ -3,6 +3,7 @@ import {ComponentPropsWithoutRef} from 'react'
 import {Error} from 'components/Error'
 import {Frame, Page} from 'foundation'
 import {logging} from 'utils/logging'
+import {api} from 'src/utils/api'
 
 import {OrgRegion} from './components'
 
@@ -94,12 +95,7 @@ export function RegionPage(props: Props) {
   }
 
   async function handleCreate(event: any) {
-    const res = await fetch('/api/events/create', {
-      method: 'POST',
-      body: JSON.stringify(event),
-    })
-    const result = await res.json()
-    logging.info('event created', result)
+    await api('events/create', event)
     router.replace(router.asPath)
   }
 
@@ -113,12 +109,13 @@ export function RegionPage(props: Props) {
       },
       deleted: false,
     }
-    const res = await fetch('/api/events/update', {
-      method: 'POST',
-      body: JSON.stringify(update),
-    })
-    const result = await res.json()
-    logging.info('event updated', result)
+    // const res = await fetch('/api/events/update', {
+    //   method: 'POST',
+    //   body: JSON.stringify(update),
+    // })
+    // const result = await res.json()
+    // logging.info('event updated', result)
+    await api('events/update', update)
     router.replace(router.asPath)
   }
 

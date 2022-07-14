@@ -1,60 +1,31 @@
 import type {NextApiRequest, NextApiResponse} from 'next'
-import {ResultOrError} from 'types'
 import {
   EventRepository,
   RegionalEvent,
   RegionalEventModel,
   RegionRepository,
 } from 'data'
-
-export type Body = RegionalEvent
-export type Payload = ResultOrError<RegionalEventModel>
+import {ApiError, ApiResponse} from 'types'
+import {apiAction} from 'utils/api'
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Payload>,
+  res: NextApiResponse<ApiResponse<RegionalEventModel>>,
 ) {
-  try {
-    const body = JSON.parse(req.body) as Body
-    const {date, details} = body
-    const region = await RegionRepository.default.fromName(
-      body.org,
-      body.region,
-    )
+  return apiAction(req, res, 'create event').run<RegionalEvent>(
+    async ({date, details, org, region}) => {
+      const model = await RegionRepository.default.fromName(org, region)
 
-    if (!region) {
-      res.status(500).json({
-        error: {
-          message: 'invalid body',
-          body: req.body,
-          parsed: body,
-        },
+      if (!model) {
+        throw new ApiError(`region ${region} not found for ${org}`)
+      }
+
+      return EventRepository.default.create({
+        date,
+        details,
+        org,
+        region,
       })
-      return
-    }
-
-    const result = await EventRepository.default.create({
-      org: region.org,
-      region: region.name,
-      date,
-      details,
-    })
-
-    if ('error' in result) {
-      res.status(500).json({
-        error: {
-          message: 'unable to create event',
-          body: req.body,
-          result: result.error,
-        },
-      })
-      return
-    }
-
-    res.status(200).json(result)
-  } catch (error) {
-    res.status(500).json({
-      error,
-    })
-  }
+    },
+  )
 }

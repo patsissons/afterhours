@@ -13,6 +13,7 @@ import {
   AnyId,
   BaseDocument,
   BaseModel,
+  ISO8601Date,
   DocUpdate,
   ModelIdentifiable,
   ModelUpdate,
@@ -36,6 +37,10 @@ export abstract class MongoRepository<
 
   static coerceObjectId(id: AnyId) {
     return id instanceof ObjectId ? id : this.toDocId(id)
+  }
+
+  static coerceDate(date: ISO8601Date) {
+    return new Date(date)
   }
 
   static async db() {
@@ -72,7 +77,7 @@ export abstract class MongoRepository<
   ): Promise<Doc> {
     const created = new Date()
     const doc = {
-      ...(data as Document),
+      ...sanitize(data as Doc),
       created,
       updated: created,
       deleted: false,
@@ -87,6 +92,10 @@ export abstract class MongoRepository<
     }
 
     return {...doc, _id} as Doc
+
+    function sanitize({_id, created, updated, deleted, ...doc}: Doc): Document {
+      return doc
+    }
   }
 
   static async update<Doc extends BaseDocument>(
@@ -95,7 +104,7 @@ export abstract class MongoRepository<
   ): Promise<Doc> {
     const filter = {_id} as Filter<Doc>
     const update = {
-      $set: {...(data as Document), updated: new Date(), deleted},
+      $set: {...sanitize(data as Doc), updated: new Date(), deleted},
     } as UpdateFilter<Doc>
     const {ok, value, lastErrorObject} = await (
       await this.collection<Doc>(collectionName)
@@ -108,6 +117,10 @@ export abstract class MongoRepository<
     }
 
     return value as Doc
+
+    function sanitize({_id, created, updated, ...doc}: Doc): Document {
+      return doc
+    }
   }
 
   static async delete<Doc extends BaseDocument>(
@@ -156,13 +169,11 @@ export abstract class MongoRepository<
     return this.toModel(result)
   }
 
-  public async update({id, deleted, ...model}: ModelUpdate<Model>) {
-    const data: DocUpdate<Doc> = {
-      ...this.coerceDoc(model as NakedModel<Model>),
-      _id: this.coerceObjectId(id),
-      deleted,
-    }
-    const result = await MongoRepository.update<Doc>(this.collectionName, data)
+  public async update(data: ModelUpdate<Model>) {
+    const result = await MongoRepository.update<Doc>(
+      this.collectionName,
+      this.toDoc(data as Model),
+    )
 
     return this.toModel(result)
   }
@@ -175,6 +186,20 @@ export abstract class MongoRepository<
 
   protected coerceObjectId(id: string | ObjectId) {
     return MongoRepository.coerceObjectId(id)
+  }
+
+  protected coerceDate(date: ISO8601Date) {
+    return MongoRepository.coerceDate(date)
+  }
+
+  protected toDoc({id, created, updated, deleted, ...model}: Model): Doc {
+    return {
+      ...this.coerceDoc(model),
+      _id: this.coerceObjectId(id),
+      created: this.coerceDate(created),
+      updated: this.coerceDate(updated),
+      deleted,
+    } as Doc
   }
 
   protected toModel(doc: Doc): Model
