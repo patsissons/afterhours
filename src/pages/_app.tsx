@@ -1,6 +1,9 @@
 import type {AppProps} from 'next/app'
 import {SessionProvider} from 'next-auth/react'
+import {App} from 'foundation'
+
 import 'styles/globals.css'
+import '@shopify/polaris/build/esm/styles.css'
 
 export default function AfterhoursApp({
   Component,
@@ -8,7 +11,9 @@ export default function AfterhoursApp({
 }: AppProps) {
   return (
     <SessionProvider session={session}>
-      <Component {...pageProps} />
+      <App>
+        <Component {...pageProps} />
+      </App>
     </SessionProvider>
   )
 }

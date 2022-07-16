@@ -1,7 +1,7 @@
 import {useRouter} from 'next/router'
 import {ComponentPropsWithoutRef} from 'react'
 import {Error} from 'components/Error'
-import {Frame, Page} from 'foundation'
+import {AppPage} from 'components/AppPage'
 import {logging} from 'utils/logging'
 import {api} from 'src/utils/api'
 
@@ -16,11 +16,9 @@ export function RegionPage(props: Props) {
 
   if ('error' in props) {
     return (
-      <Frame>
-        <Page title="Error">
-          <Error error={props.error} />
-        </Page>
-      </Frame>
+      <AppPage title="Error">
+        <Error error={props.error} />
+      </AppPage>
     )
   }
 
@@ -29,64 +27,60 @@ export function RegionPage(props: Props) {
     const displayRegion = region.toUpperCase()
 
     return (
-      <Frame title={`${org} ${displayRegion} afterhours`}>
-        <Page
-          title={`${displayRegion} afterhours`}
-          description={`${org} events for ${displayRegion}`}
-        >
-          <input type="text" id="event-id" />
-          <button
-            type="button"
-            onClick={() => {
-              handleCreate({
-                date: new Date().toISOString(),
-                org,
-                region,
-                details: {
-                  location: {
-                    name: 'testing',
-                  },
+      <AppPage
+        title={`${displayRegion} afterhours`}
+        description={`${org} events for ${displayRegion}`}
+      >
+        <input type="text" id="event-id" />
+        <button
+          type="button"
+          onClick={() => {
+            handleCreate({
+              date: new Date().toISOString(),
+              org,
+              region,
+              details: {
+                location: {
+                  name: 'testing',
                 },
-              })
-            }}
-          >
-            create test event
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              const id = eventIdElement()
+              },
+            })
+          }}
+        >
+          create test event
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            const id = eventIdElement()
 
-              if (id) {
-                const event = props.events.find(
-                  (event) => event.id === id.value,
-                )
+            if (id) {
+              const event = props.events.find((event) => event.id === id.value)
 
-                if (event) {
-                  handleUpdate(event)
-                  id.value = ''
-                }
-              }
-            }}
-          >
-            update by id
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              const id = eventIdElement()
-
-              if (id) {
-                handleDelete(id.value)
+              if (event) {
+                handleUpdate(event)
                 id.value = ''
               }
-            }}
-          >
-            delete by id
-          </button>
-          <OrgRegion org={org} region={props.region} events={props.events} />
-        </Page>
-      </Frame>
+            }
+          }}
+        >
+          update by id
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            const id = eventIdElement()
+
+            if (id) {
+              handleDelete(id.value)
+              id.value = ''
+            }
+          }}
+        >
+          delete by id
+        </button>
+        <OrgRegion org={org} region={props.region} events={props.events} />
+      </AppPage>
     )
   }
 
@@ -109,12 +103,6 @@ export function RegionPage(props: Props) {
       },
       deleted: false,
     }
-    // const res = await fetch('/api/events/update', {
-    //   method: 'POST',
-    //   body: JSON.stringify(update),
-    // })
-    // const result = await res.json()
-    // logging.info('event updated', result)
     await api('events/update', update)
     router.replace(router.asPath)
   }

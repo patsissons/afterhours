@@ -4,8 +4,8 @@ import {logging} from 'utils/logging'
 
 interface User {
   email: string
-  name?: string | null
-  image?: string | null
+  name?: string
+  image?: string
 }
 
 export function useAuth() {
