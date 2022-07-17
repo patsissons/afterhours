@@ -1,18 +1,22 @@
 import {GetServerSidePropsContext, GetServerSidePropsResult} from 'next'
 import {OrgPage, Props} from 'containers/OrgPage'
 import {RegionRepository} from 'data'
-import {orgForHost} from 'utils/host'
+import {orgForHost} from 'utils/url'
 import {logging} from 'utils/logging'
+import {PageProps} from 'types'
 
 export {OrgPage as default}
 
 export async function getServerSideProps({
   req,
-}: GetServerSidePropsContext): Promise<GetServerSidePropsResult<Props>> {
+}: GetServerSidePropsContext): Promise<
+  GetServerSidePropsResult<PageProps<Props>>
+> {
   try {
     const host = req.headers.host
 
     if (!host) {
+      // this should never happen
       return {
         notFound: true,
       }

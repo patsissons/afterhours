@@ -2,7 +2,7 @@
 module.exports = {
   extends: [
     'plugin:@shopify/typescript',
-    // 'plugin:@shopify/react',
+    'plugin:@shopify/react',
     'plugin:@shopify/prettier',
     // 'plugin:@shopify/polaris',
     'plugin:react/jsx-runtime',

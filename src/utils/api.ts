@@ -37,24 +37,39 @@ export function apiAction<Output>(
   }
 }
 
-export async function api(path: string, data: any) {
+export interface ApiClientOptions {
+  data?: any
+  method?: 'POST' | 'GET'
+}
+
+export type ApiClientResponse<Output> = ApiResponse<{
+  status: number
+  result: Output
+}>
+
+export async function api<Output = unknown>(
+  path: string,
+  {data, method = 'POST'}: ApiClientOptions = {},
+): Promise<ApiClientResponse<Output>> {
   try {
     logging.debug(`Request ${path}`, data)
     const res = await fetch(`/api/${path}`, {
-      method: 'POST',
+      method,
       body: data && JSON.stringify(data),
     })
     const result = await res.json()
     logging.debug(`Response ${path}`, result)
 
-    if (res.status >= 400 || result.error) {
+    const {status} = res
+
+    if (status >= 400 || result.error) {
       const {message, ...error} = result.error
       logging.error(`Error: ${message}`, error)
     }
 
-    return result
+    return {status, result}
   } catch (error: any) {
     logging.error(error.toString(), {error})
-    return undefined
+    return {error}
   }
 }

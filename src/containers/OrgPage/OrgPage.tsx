@@ -1,39 +1,38 @@
 import {ComponentPropsWithoutRef} from 'react'
-import {Error} from 'components/Error'
 import {AppPage} from 'components/AppPage'
 import {EmptyProps} from 'types'
+import {RegionsProvider} from 'hooks/regions/provider'
+import {RegionModel} from 'data'
 
-import {Auth, Org} from './components'
+import {Landing, Org} from './components'
+import {useDevelopmentSessionToken} from './hooks'
 
-export type Props =
-  | EmptyProps
-  | ComponentPropsWithoutRef<typeof Error>
-  | ComponentPropsWithoutRef<typeof Org>
+export interface OrgProps extends ComponentPropsWithoutRef<typeof Org> {
+  regions: RegionModel[]
+}
+
+export type Props = EmptyProps | OrgProps
 
 export function OrgPage(props: Props) {
-  if ('error' in props) {
-    return (
-      <AppPage title="Error">
-        <Error error={props.error} />
-      </AppPage>
-    )
-  }
+  useDevelopmentSessionToken()
 
-  if ('regions' in props) {
-    const org = props.org
+  if ('org' in props) {
+    const {org, regions} = props
     return (
       <AppPage
         title={`${org} afterhours regions`}
         description="Click on a region to see the events"
       >
-        <Org org={org} regions={props.regions} />
+        <RegionsProvider regions={regions}>
+          <Org org={org} />
+        </RegionsProvider>
       </AppPage>
     )
   }
 
   return (
     <AppPage title="afterhours">
-      <Auth />
+      <Landing />
     </AppPage>
   )
 }

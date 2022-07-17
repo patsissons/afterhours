@@ -1,0 +1,10 @@
+{
+  "title": "{count} regions",
+  "form": {
+    "title": "New region",
+    "submit": "Create region"
+  },
+  "banner": {
+    "content": "Add a new region to {org}"
+  }
+}

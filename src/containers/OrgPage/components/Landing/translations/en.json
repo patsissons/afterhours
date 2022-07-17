@@ -1,0 +1,17 @@
+{
+  "Landing": {
+    "title": {
+      "auth": "Select an organization",
+      "unauth": "Sign in access your organization"
+    },
+    "welcome": "Welcome to afterhours, where you can view and post after hours events for your organization and region.",
+    "info": {
+      "auth": "Choose an organization on the left to view its regions.",
+      "unauth": "Once signed in you can access the regions in your organization."
+    },
+    "authAction": {
+      "auth": "Sign out",
+      "unauth": "Sign in"
+    }
+  }
+}

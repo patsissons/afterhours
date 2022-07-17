@@ -3,13 +3,14 @@ import {createHash} from 'crypto'
 import {TopBar} from '@shopify/polaris'
 import {useCallback, useState} from 'react'
 import {useAuth, useAuthOrg} from 'hooks/auth'
+import {LogOutMinor, ProfileMinor} from '@shopify/polaris-icons'
 
 export interface Props {
   toggleMobileNavigation(): void
 }
 
 export function AppTopBar({toggleMobileNavigation}: Props) {
-  const {user} = useAuth()
+  const {user, authAction} = useAuth()
   const org = useAuthOrg()
   const [userMenuActive, setUserMenuActive] = useState(false)
 
@@ -30,10 +31,20 @@ export function AppTopBar({toggleMobileNavigation}: Props) {
 
     return (
       <TopBar.UserMenu
-        actions={[]}
+        actions={[
+          {
+            items: [
+              {
+                content: `Sign ${user ? 'out' : 'in'}`,
+                onAction: authAction,
+                icon: user ? LogOutMinor : ProfileMinor,
+              },
+            ],
+          },
+        ]}
         name={name}
         detail={org}
-        initials="T"
+        initials={user?.name?.slice(0, 1)}
         open={userMenuActive}
         onToggle={toggleUserMenu}
         accessibilityLabel="user menu"

@@ -5,9 +5,9 @@ import {apiAction} from 'utils/api'
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<ApiResponse<RegionModel>>,
+  res: NextApiResponse<ApiResponse<RegionModel[]>>,
 ) {
-  return apiAction(req, res, 'create region').run<RegionModel>((input) =>
-    RegionRepository.default.create(input),
+  return apiAction(req, res, 'fetch regions').run<string>((org) =>
+    RegionRepository.default.fromOrg(org),
   )
 }

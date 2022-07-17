@@ -1,26 +1,15 @@
 import {useRouter} from 'next/router'
 import {ComponentPropsWithoutRef} from 'react'
-import {Error} from 'components/Error'
 import {AppPage} from 'components/AppPage'
 import {logging} from 'utils/logging'
-import {api} from 'src/utils/api'
+import {api} from 'utils/api'
 
 import {OrgRegion} from './components'
 
-export type Props =
-  | ComponentPropsWithoutRef<typeof Error>
-  | ComponentPropsWithoutRef<typeof OrgRegion>
+export type Props = ComponentPropsWithoutRef<typeof OrgRegion>
 
 export function RegionPage(props: Props) {
   const router = useRouter()
-
-  if ('error' in props) {
-    return (
-      <AppPage title="Error">
-        <Error error={props.error} />
-      </AppPage>
-    )
-  }
 
   if ('events' in props) {
     const {org, region} = props

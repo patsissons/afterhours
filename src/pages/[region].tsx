@@ -1,8 +1,9 @@
 import {GetServerSidePropsContext, GetServerSidePropsResult} from 'next'
 import {RegionPage, Props} from 'containers/RegionPage'
 import {EventRepository, RegionRepository} from 'data'
-import {orgForHost} from 'utils/host'
+import {orgForHost} from 'utils/url'
 import {logging} from 'utils/logging'
+import {PageProps} from 'types'
 
 export default RegionPage
 
@@ -10,7 +11,9 @@ export async function getServerSideProps({
   query,
   req,
   resolvedUrl,
-}: GetServerSidePropsContext): Promise<GetServerSidePropsResult<Props>> {
+}: GetServerSidePropsContext): Promise<
+  GetServerSidePropsResult<PageProps<Props>>
+> {
   try {
     const {host} = req.headers
 
