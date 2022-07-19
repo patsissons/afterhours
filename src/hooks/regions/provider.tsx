@@ -1,10 +1,13 @@
+import {ModelIdentifiable} from 'mongo-repository'
 import {PropsWithChildren, useCallback, useMemo, useState} from 'react'
 import {Region, RegionModel} from 'data'
-import {api} from 'utils/api'
+import {api, ApiClientOptions} from 'utils/api'
 import {logging} from 'utils/logging'
 
 import {RegionsContext} from './context'
 import {RegionsContextType} from './types'
+
+const model = 'region'
 
 export interface Props {
   regions: RegionModel[]
@@ -16,43 +19,79 @@ export function RegionsProvider({
 }: PropsWithChildren<Props>) {
   const [regions, setRegions] = useState(loadedRegions)
 
-  const refresh = useCallback(async () => {
-    try {
-      const res = await api<RegionModel[]>('regions', {method: 'GET'})
+  const fetch = useCallback(
+    () => apiCall<RegionModel[]>(model, 'fetch', setRegions, {method: 'GET'}),
+    [],
+  )
 
-      if ('error' in res) {
-        throw res.error
-      }
+  const create = useCallback(
+    (data: Region) =>
+      apiCall<RegionModel>(
+        model,
+        'create',
+        (data) => setRegions((regions) => [data, ...regions]),
+        {data},
+      ),
+    [],
+  )
 
-      setRegions(res.result)
-    } catch (error: any) {
-      logging.error('region refresh error', error)
-    }
-  }, [])
+  const update = useCallback(
+    (data: RegionModel) =>
+      apiCall<RegionModel>(
+        model,
+        'update',
+        (data) => {
+          setRegions((regions) => [
+            data,
+            ...regions.filter(({id}) => id !== data.id),
+          ])
+        },
+        {data},
+      ),
+    [],
+  )
 
-  const create = useCallback(async (data: Region) => {
-    try {
-      const res = await api<RegionModel>('regions/create', {data})
-
-      if ('error' in res) {
-        throw res.error
-      }
-
-      setRegions((regions) => [...regions, res.result])
-
-      return res.result
-    } catch (error: any) {
-      logging.error('region refresh error', error)
-      return {error}
-    }
-  }, [])
+  const remove = useCallback(
+    (data: ModelIdentifiable) =>
+      apiCall<RegionModel>(
+        model,
+        'remove',
+        (data) => {
+          setRegions((regions) => regions.filter(({id}) => id !== data.id))
+        },
+        {data},
+      ),
+    [],
+  )
 
   const value = useMemo<RegionsContextType>(
-    () => ({regions, refresh, create}),
-    [refresh, regions, create],
+    () => ({regions, fetch, create, update, remove}),
+    [regions, fetch, create, update, remove],
   )
 
   return (
     <RegionsContext.Provider value={value}>{children}</RegionsContext.Provider>
   )
+}
+
+async function apiCall<Result>(
+  model: string,
+  action: string,
+  onSuccess: (res: Result) => void,
+  options?: ApiClientOptions,
+) {
+  try {
+    const res = await api<Result>(`${model}s/${action}`, options)
+
+    if ('error' in res) {
+      throw res.error
+    }
+
+    onSuccess(res.result)
+
+    return res.result
+  } catch (error: any) {
+    logging.error(`${model} ${action} error`, error)
+    return {error}
+  }
 }
