@@ -1,23 +1,80 @@
-import type {RegionalEvent} from 'data'
+import {Banner, Card, Collapsible} from '@shopify/polaris'
+import {useI18n} from '@shopify/react-i18n'
+import type {RegionalEventModel, RegionModel} from 'data'
+import {useCallback, useState} from 'react'
 
-import {RegionEvent} from './components'
+import {RegionEventForm, RegionEventSection} from './components'
 
 export interface Props {
-  org: string
-  region: string
-  events: (RegionalEvent & {id: string})[]
+  region: RegionModel
+  events: RegionalEventModel[]
 }
 
-export function OrgRegion({events}: Props) {
-  if (events.length > 0) {
+export function OrgRegion({region, events}: Props) {
+  const {
+    details: {displayName},
+  } = region
+
+  const [i18n] = useI18n()
+  const [formVisible, setFormVisible] = useState(false)
+
+  const toggleForm = useCallback(() => {
+    setFormVisible((value) => !value)
+  }, [])
+
+  return (
+    <Card
+      title={i18n.translate('title', {count: events.length})}
+      actions={[
+        {
+          content: formVisible ? 'Hide event form' : 'Show create event form',
+          onAction: toggleForm,
+        },
+      ]}
+    >
+      {renderForm()}
+      {renderEvents()}
+    </Card>
+  )
+
+  function renderForm() {
+    if (!formVisible) {
+      return null
+    }
+
     return (
-      <>
-        {events.map((event) => (
-          <RegionEvent key={event.id} {...event} />
-        ))}
-      </>
+      <Card.Section title={i18n.translate('form.title')}>
+        <Collapsible id="new-event-form" open={formVisible}>
+          <RegionEventForm />
+        </Collapsible>
+      </Card.Section>
     )
   }
 
-  return <p>No events yet...</p>
+  function renderEvents() {
+    if (events.length === 0) {
+      return (
+        <Card.Section>
+          <Banner title="No events yet" status="info" action={bannerAction()}>
+            <p>{i18n.translate('banner.content', {region: displayName})}</p>
+          </Banner>
+        </Card.Section>
+      )
+    }
+
+    return events.map((event) => {
+      return <RegionEventSection key={event.id} event={event} />
+    })
+
+    function bannerAction() {
+      if (formVisible) {
+        return undefined
+      }
+
+      return {
+        content: 'Add new event',
+        onAction: toggleForm,
+      }
+    }
+  }
 }

@@ -10,12 +10,14 @@ import {RegionsContextType} from './types'
 const model = 'region'
 
 export interface Props {
-  regions: RegionModel[]
+  org: string
+  regions?: RegionModel[]
 }
 
 export function RegionsProvider({
   children,
-  regions: loadedRegions,
+  org,
+  regions: loadedRegions = [],
 }: PropsWithChildren<Props>) {
   const [regions, setRegions] = useState(loadedRegions)
 
@@ -65,8 +67,8 @@ export function RegionsProvider({
   )
 
   const value = useMemo<RegionsContextType>(
-    () => ({regions, fetch, create, update, remove}),
-    [regions, fetch, create, update, remove],
+    () => ({org, regions, fetch, create, update, remove}),
+    [org, regions, fetch, create, update, remove],
   )
 
   return (

@@ -1,7 +1,6 @@
 import {ComponentPropsWithoutRef} from 'react'
 import {AppPage} from 'components/AppPage'
 import {EmptyProps} from 'types'
-import {RegionsProvider} from 'hooks/regions/provider'
 import {RegionModel} from 'data'
 
 import {Landing, Org} from './components'
@@ -17,15 +16,14 @@ export function OrgPage(props: Props) {
   useDevelopmentSessionToken()
 
   if ('org' in props) {
-    const {org, regions} = props
+    const {org} = props
+
     return (
       <AppPage
         title={`${org} afterhours regions`}
         description="Click on a region to see the events"
       >
-        <RegionsProvider regions={regions}>
-          <Org org={org} />
-        </RegionsProvider>
+        <Org org={org} />
       </AppPage>
     )
   }

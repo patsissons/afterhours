@@ -46,7 +46,7 @@ export function Org({org}: Props) {
 
     return (
       <Card.Section title={i18n.translate('form.title')}>
-        <Collapsible id="region-form" open={formVisible}>
+        <Collapsible id="new-region-form" open={formVisible}>
           <RegionForm org={org} />
         </Collapsible>
       </Card.Section>

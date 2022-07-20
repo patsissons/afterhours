@@ -1,7 +1,7 @@
 import {GetServerSidePropsContext, GetServerSidePropsResult} from 'next'
 import {RegionPage, Props} from 'containers/RegionPage'
 import {EventRepository, RegionRepository} from 'data'
-import {orgForHost} from 'utils/url'
+import {hostWithoutOrg, orgForHost} from 'utils/url'
 import {logging} from 'utils/logging'
 import {PageProps} from 'types'
 
@@ -18,6 +18,7 @@ export async function getServerSideProps({
     const {host} = req.headers
 
     if (!host) {
+      // this should never happen
       return {
         notFound: true,
       }
@@ -27,16 +28,24 @@ export async function getServerSideProps({
 
     if (!org) {
       return {
-        notFound: true,
+        redirect: {
+          permanent: false,
+          destination: hostWithoutOrg(host),
+        },
       }
     }
 
+    const regions = await RegionRepository.default.fromOrg(org)
     const name = resolvedUrl.replace(/^\//, '')
     const region = await RegionRepository.default.fromName(org, name)
 
     if (!region) {
       return {
-        notFound: true,
+        props: {
+          org,
+          regions,
+          region: name,
+        },
       }
     }
 
@@ -48,7 +57,8 @@ export async function getServerSideProps({
     return {
       props: {
         org,
-        region: name,
+        regions,
+        region,
         events,
       },
     }

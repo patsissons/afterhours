@@ -1,1 +1,2 @@
-export * from './RegionEvent'
+export * from './RegionEventForm'
+export * from './RegionEventSection'

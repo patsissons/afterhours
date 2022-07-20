@@ -17,12 +17,14 @@ export interface RegionalEventDetails {
     coords?: string
     url?: string
   }
+  visible: boolean
   notes?: string
 }
 
 export interface RegionalEvent {
   org: string
   region: string
+  name: string
   date: ISO8601Date
   details: RegionalEventDetails
 }

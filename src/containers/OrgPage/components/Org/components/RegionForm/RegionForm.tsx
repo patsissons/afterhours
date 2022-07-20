@@ -1,4 +1,11 @@
-import {Button, Checkbox, Form, FormLayout, TextField} from '@shopify/polaris'
+import {
+  Button,
+  ButtonGroup,
+  Checkbox,
+  Form,
+  FormLayout,
+  TextField,
+} from '@shopify/polaris'
 import {
   asChoiceField,
   submitFail,
@@ -10,6 +17,8 @@ import {useI18n} from '@shopify/react-i18n'
 import {useRegions} from 'hooks/regions'
 import {useToast} from 'hooks/toast'
 import {RegionModel} from 'data'
+
+import {RemoveRegionButton} from './components'
 
 export interface Props {
   org: string
@@ -67,15 +76,18 @@ export function RegionForm({org, region}: Props) {
         />
         <TextField {...fields.notes} label="Notes" autoComplete="false" />
         <Checkbox {...asChoiceField(fields.visible)} label="visible" />
-        <Button
-          submit
-          primary
-          onClick={submit}
-          disabled={!dirty}
-          loading={submitting}
-        >
-          {i18n.translate(region?.id ? 'update' : 'create')}
-        </Button>
+        <ButtonGroup>
+          <Button
+            submit
+            primary
+            onClick={submit}
+            disabled={!dirty}
+            loading={submitting}
+          >
+            {i18n.translate(region?.id ? 'update' : 'create')}
+          </Button>
+          {region && <RemoveRegionButton region={region} />}
+        </ButtonGroup>
       </FormLayout>
     </Form>
   )

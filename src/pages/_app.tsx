@@ -3,6 +3,7 @@ import {SessionProvider} from 'next-auth/react'
 import {App} from 'foundation'
 import {AppPage} from 'components/AppPage'
 import {Error} from 'components/Error'
+import {RegionsProvider} from 'hooks/regions/provider'
 
 import 'styles/globals.css'
 import '@shopify/polaris/build/esm/styles.css'
@@ -13,7 +14,9 @@ export default function AfterhoursApp({
 }: AppProps) {
   return (
     <SessionProvider session={session}>
-      <App>{renderComponent()}</App>
+      <RegionsProvider org={props.org} regions={props.regions}>
+        <App {...props}>{renderComponent()}</App>
+      </RegionsProvider>
     </SessionProvider>
   )
 

@@ -1,0 +1,9 @@
+{
+  "title": "{count} events",
+  "form": {
+    "title": "New event"
+  },
+  "banner": {
+    "content": "Add a new event to {region}"
+  }
+}
