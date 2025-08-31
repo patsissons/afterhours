@@ -129,7 +129,10 @@ export abstract class MongoRepository<
   ): Promise<Doc> {
     const filter = {_id: this.toDocId(id)} as Filter<Doc>
     const update = {
-      $set: {updated: new Date(), deleted: true},
+      $set: {
+        updated: new Date(),
+        deleted: true,
+      } as Doc,
     } as UpdateFilter<Doc>
     const {ok, value, lastErrorObject} = await (
       await this.collection<Doc>(collectionName)
