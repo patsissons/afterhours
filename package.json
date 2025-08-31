@@ -3,8 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": "^16.15.0"
+    "pnpm": "^10",
+    "node": "^22"
   },
+  "packageManager": "pnpm@10.14.0",
   "scripts": {
     "conf": "yarn run conf:link && yarn run conf:env",
     "conf:link": "test -f .vercel/project.json || vercel link",
